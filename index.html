@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>One Important Question 💕</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="card">
+
+    <video class="sticker" id="sticker" autoplay loop muted>
+        <source src="main.mp4" type="video/mp4">
+    </video>
+
+    <h1 id="question">Can I take you out sometime? 😊</h1>
+    <p id="subtext">I promise good food, good talks, and zero awkward silence.</p>
+
+    <div id="buttons">
+        <button class="yes" id="yesBtn" onclick="handleYes()">Yes 💗</button>
+        <button class="no" onclick="handleNo()">No 😶</button>
+    </div>
+
+</div>
+
+<audio id="happySong" loop>
+    <source src="happy.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="sadSong" loop>
+    <source src="sad.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+
+let mode = "none";
+let yesStep = 0;
+let noStep = 0;
+let yesFontSize = 16;
+
+const noJourney = [
+
+{ q:"Oh… a no already? 😅",
+  s:"That was fast. Should I at least get a reason?" },
+
+{ q:"Is it a timing issue?",
+  s:"Or are you just trying to act mysterious? 😏" },
+
+{ q:"Okay wait… be honest.",
+  s:"If I asked you in a slightly cooler way, would that help?" },
+
+{ q:"What if it’s not even a ‘date’ date?",
+  s:"Just two people pretending not to be nervous." },
+
+{ q:"You’re smiling right now, aren’t you?",
+  s:"Because I can feel it from here." },
+
+{ q:"Alright negotiator mode activated 😌",
+  s:"Coffee. 30 minutes. Public place. Zero pressure." },
+
+{ q:"Still no?",
+  s:"You’re tougher than I expected. Respect." },
+
+{ q:"Okay but imagine this...",
+  s:"We actually have fun and you say ‘I almost said no to this?’" },
+
+{ q:"Last question before I behave...",
+  s:"Are you saying no because you’re unsure… or because you’re shy?" },
+
+{ q:"Alright, final final attempt 😌",
+  s:"If I promise to make you laugh at least once, would you reconsider?" }
+
+];
+
+const yesJourney = [
+
+{type:"text",
+ q:"Wait… that’s actually a YES? 😳💖",
+ s:"Okay now I’m trying not to smile too much."},
+
+{type:"choice",
+ q:"First date vibe?",
+ s:"What makes you blush more?",
+ options:["Cute coffee ☕","Romantic sunset 🌅"]},
+
+{type:"choice",
+ q:"How should I dress?",
+ s:"Be honest, I can handle it 😏",
+ options:["Soft charming 😌","Confident & dangerous 😎"]},
+
+{type:"choice",
+ q:"If I compliment you all night…",
+ s:"What happens?",
+ options:["I blush 😳","I pretend I don’t care 😏"]},
+
+{type:"choice",
+ q:"Picture this…",
+ s:"Which sounds better?",
+ options:["Holding hands quietly 🤝","Laughing too loud together 😂"]},
+
+{type:"text",
+ q:"You know this means I get to plan something special right?",
+ s:"No pressure… just unforgettable."},
+
+{type:"choice",
+ q:"Daily good morning texts?",
+ s:"Too much or secretly cute?",
+ options:["Secretly cute 💕","Okay that’s adorable 😅"]},
+
+{type:"choice",
+ q:"Late night talks?",
+ s:"Deep conversations or random nonsense?",
+ options:["Deep & meaningful 🌙","Random chaos 😂"]},
+
+{type:"text",
+ q:"Okay serious question…",
+ s:"Are you ready for someone who genuinely likes you?"},
+
+{type:"text",
+ q:"So this is officially the beginning? 💕",
+ s:"I’m really glad it’s you."}
+];
+
+function playHappy(){
+    let happy=document.getElementById("happySong");
+    let sad=document.getElementById("sadSong");
+    if(mode!=="yes"){
+        sad.pause();
+        happy.currentTime=0;
+        happy.play();
+        mode="yes";
+    }
+}
+
+function playSad(){
+    let happy=document.getElementById("happySong");
+    let sad=document.getElementById("sadSong");
+    if(mode!=="no"){
+        happy.pause();
+        sad.currentTime=0;
+        sad.play();
+        mode="no";
+    }
+}
+
+function handleNo(){
+
+    playSad();
+
+    document.getElementById("sticker").innerHTML =
+        "<source src='no1.mp4' type='video/mp4'>";
+
+    document.getElementById("question").innerText =
+        noJourney[noStep].q;
+
+    document.getElementById("subtext").innerText =
+        noJourney[noStep].s;
+
+    yesFontSize += 2;
+    let yesBtn=document.getElementById("yesBtn");
+    if(yesBtn){
+        yesBtn.style.fontSize = yesFontSize + "px";
+    }
+
+    noStep++;
+    if(noStep >= noJourney.length) noStep = 0;
+}
+
+function handleYes(){
+
+    playHappy();
+
+    document.getElementById("sticker").innerHTML =
+        "<source src='happy.mp4' type='video/mp4'>";
+
+    showYesStep();
+}
+
+function showYesStep(){
+
+    let step=yesJourney[yesStep];
+    let buttonsDiv=document.getElementById("buttons");
+
+    if(!step){
+
+        document.getElementById("question").innerText =
+            "Thank you for saying yes 😌💖";
+
+        document.getElementById("subtext").innerText =
+            "You just made someone very happy. And honestly… you look even cuter smiling right now.";
+
+        buttonsDiv.innerHTML =
+            "<button class='yes'>Okay stop smiling like that 😏</button>";
+
+        return;
+    }
+
+    document.getElementById("question").innerText=step.q;
+    document.getElementById("subtext").innerText=step.s;
+
+    if(step.type==="text"){
+        buttonsDiv.innerHTML=
+            "<button class='yes' onclick='nextYes()'>Continue 😌</button>";
+    }
+    else{
+        buttonsDiv.innerHTML=
+            "<button class='yes' onclick='nextYes()'>"+step.options[0]+"</button>"+
+            "<button class='no' onclick='nextYes()'>"+step.options[1]+"</button>";
+    }
+}
+
+function nextYes(){
+    yesStep++;
+    showYesStep();
+}
+
+</script>
+
+</body>
+</html>

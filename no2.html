@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Final Answer 😭</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="card" id="card">
+    <video class="sticker" autoplay loop muted>
+        <source src="no2.mp4" type="video/mp4">
+    </video>
+
+    <h1>Stop in the name of humanity 😭</h1>
+    <p>Even after all this effort?</p>
+
+    <button class="yes" onclick="goBack()">Alright YES ❤️</button>
+    <button class="no" onclick="finalMessage()">Still No 😅</button>
+</div>
+
+<script>
+function goBack() {
+    window.location.href = "index.html";
+}
+
+function finalMessage() {
+    document.getElementById("card").innerHTML =
+        "<video class='sticker' autoplay loop muted><source src='happy.mp4' type='video/mp4'></video>" +
+        "<h1>Thank you for being honest ❤️</h1>" +
+        "<p>I respect your answer and still wish you happiness ✨</p>";
+}
+</script>
+
+</body>
+</html>
