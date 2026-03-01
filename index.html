@@ -2,8 +2,95 @@
 <html>
 <head>
     <title>One Important Question 💕</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #fbc2eb, #fcd6e6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 520px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .sticker {
+            width: 220px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+        }
+
+        #buttons {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            margin: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .yes {
+            background: #ff7eb3;
+            color: white;
+        }
+
+        .no {
+            background: #cccccc;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        /* Celebration Screen */
+        #celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #ff9a9e, #fad0c4);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
+            color: white;
+            text-align: center;
+        }
+
+        .firework {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: explode 1s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(8); opacity: 0; }
+        }
+    </style>
 </head>
+
 <body>
 
 <div class="card">
@@ -12,14 +99,21 @@
         <source src="main.mp4" type="video/mp4">
     </video>
 
-    <h1 id="question">Can I take you out sometime? 😊</h1>
+    <h2 id="question">Can I take you out sometime? 😊</h2>
     <p id="subtext">I promise good food, good talks, and zero awkward silence.</p>
 
     <div id="buttons">
-        <button class="yes" id="yesBtn" onclick="handleYes()">Yes 💗</button>
-        <button class="no" onclick="handleNo()">No 😶</button>
+        <button class="yes" onclick="startYes()">Yes 💗</button>
+        <button class="no" onclick="startNo()">No 😶</button>
     </div>
 
+</div>
+
+<!-- Celebration Screen -->
+<div id="celebration">
+    <h1>🎆</h1>
+    <h2>Thank you for going through this 💕</h2>
+    <p>This might be the beginning of something beautiful.</p>
 </div>
 
 <audio id="happySong" loop>
@@ -32,185 +126,289 @@
 
 <script>
 
-let mode = "none";
-let yesStep = 0;
-let noStep = 0;
-let yesFontSize = 16;
+/* =======================
+   YES TREE (10 STEPS)
+======================= */
 
-const noJourney = [
+const yesTree = {
 
-{ q:"Oh… a no already? 😅",
-  s:"That was fast. Should I at least get a reason?" },
+start:{
+q:"You said yes… are you actually serious right now? 😳",
+s:"Because I need a second to process this properly.",
+options:[
+{text:"Yes I’m serious 😌",next:"energy"},
+{text:"Maybe I am 😏",next:"energy"}
+]},
 
-{ q:"Is it a timing issue?",
-  s:"Or are you just trying to act mysterious? 😏" },
+energy:{
+q:"Okay tell me honestly.",
+s:"Are you the calm, deep thinker type… or secretly chaotic fun?",
+options:[
+{text:"Calm & thoughtful 🌙",next:"calm"},
+{text:"Chaotic & fun 😆",next:"chaotic"}
+]},
 
-{ q:"Okay wait… be honest.",
-  s:"If I asked you in a slightly cooler way, would that help?" },
+calm:{
+q:"Calm energy?",
+s:"So you enjoy long conversations and meaningful silences?",
+options:[
+{text:"That’s me 😌",next:"comfort"}
+]},
 
-{ q:"What if it’s not even a ‘date’ date?",
-  s:"Just two people pretending not to be nervous." },
+chaotic:{
+q:"Chaotic energy?",
+s:"So I should prepare for unexpected jokes and random laughter?",
+options:[
+{text:"Obviously 😂",next:"comfort"}
+]},
 
-{ q:"You’re smiling right now, aren’t you?",
-  s:"Because I can feel it from here." },
+comfort:{
+q:"Let’s imagine our first meeting.",
+s:"Would you prefer something cozy and simple or slightly romantic?",
+options:[
+{text:"Cozy & simple ☕",next:"coffee"},
+{text:"Romantic & scenic 🌅",next:"sunset"}
+]},
 
-{ q:"Alright negotiator mode activated 😌",
-  s:"Coffee. 30 minutes. Public place. Zero pressure." },
+coffee:{
+q:"Coffee choice?",
+s:"So I get to sit across from you pretending I’m not nervous?",
+options:[
+{text:"You’ll be nervous? 😏",next:"impression"},
+{text:"Probably 😅",next:"impression"}
+]},
 
-{ q:"Still no?",
-  s:"You’re tougher than I expected. Respect." },
+sunset:{
+q:"Sunset walk?",
+s:"That’s dangerously romantic of you.",
+options:[
+{text:"Maybe 😌",next:"impression"},
+{text:"I like romantic vibes",next:"impression"}
+]},
 
-{ q:"Okay but imagine this...",
-  s:"We actually have fun and you say ‘I almost said no to this?’" },
+impression:{
+q:"Can I admit something?",
+s:"I genuinely like how naturally you’re answering all this.",
+options:[
+{text:"Why? 😅",next:"future"},
+{text:"Aww 😳",next:"future"}
+]},
 
-{ q:"Last question before I behave...",
-  s:"Are you saying no because you’re unsure… or because you’re shy?" },
+future:{
+q:"If this actually turns into something real…",
+s:"Are we pretending we weren’t slightly nervous at the start?",
+options:[
+{text:"Definitely 😂",next:"serious"},
+{text:"Maybe a little 😌",next:"serious"}
+]},
 
-{ q:"Alright, final final attempt 😌",
-  s:"If I promise to make you laugh at least once, would you reconsider?" }
+serious:{
+q:"Okay, one serious question.",
+s:"Are you ready for something that’s actually genuine and not just playful talk?",
+options:[
+{text:"Maybe I am",next:"final"},
+{text:"Let’s see 😏",next:"final"}
+]},
 
-];
+final:{
+q:"Then let me say this properly.",
+s:"Thank you for saying yes. I’ll make sure this wasn’t just a cute website moment.",
+options:[]
+}
 
-const yesJourney = [
+};
 
-{type:"text",
- q:"Wait… that’s actually a YES? 😳💖",
- s:"Okay now I’m trying not to smile too much."},
+/* =======================
+   NO TREE (10 STEPS)
+======================= */
 
-{type:"choice",
- q:"First date vibe?",
- s:"What makes you blush more?",
- options:["Cute coffee ☕","Romantic sunset 🌅"]},
+const noTree = {
 
-{type:"choice",
- q:"How should I dress?",
- s:"Be honest, I can handle it 😏",
- options:["Soft charming 😌","Confident & dangerous 😎"]},
+start:{
+q:"You said no…",
+s:"Okay. I won’t react dramatically. But can I understand what made you feel that way?",
+options:[
+{text:"Too soon 😅",next:"soon"},
+{text:"Not sure 🤷",next:"unsure"}
+]},
 
-{type:"choice",
- q:"If I compliment you all night…",
- s:"What happens?",
- options:["I blush 😳","I pretend I don’t care 😏"]},
+soon:{
+q:"Too soon?",
+s:"That makes sense. Timing can matter more than feelings sometimes.",
+options:[
+{text:"Yeah timing ⏳",next:"timing"},
+{text:"Maybe a little",next:"mixed"}
+]},
 
-{type:"choice",
- q:"Picture this…",
- s:"Which sounds better?",
- options:["Holding hands quietly 🤝","Laughing too loud together 😂"]},
+unsure:{
+q:"Not sure?",
+s:"Is it something about me, or just that things don’t feel right yet?",
+options:[
+{text:"The situation",next:"timing"},
+{text:"Still unsure",next:"mixed"}
+]},
 
-{type:"text",
- q:"You know this means I get to plan something special right?",
- s:"No pressure… just unforgettable."},
+timing:{
+q:"So mostly timing?",
+s:"If I had asked at a different moment, do you think your answer might change?",
+options:[
+{text:"Maybe 🤷",next:"hope"},
+{text:"Probably not",next:"respect"}
+]},
 
-{type:"choice",
- q:"Daily good morning texts?",
- s:"Too much or secretly cute?",
- options:["Secretly cute 💕","Okay that’s adorable 😅"]},
+mixed:{
+q:"I appreciate the honesty.",
+s:"Sometimes hesitation isn’t about the person, but about where we are mentally.",
+options:[
+{text:"That’s true",next:"hope"},
+{text:"Yeah maybe",next:"respect"}
+]},
 
-{type:"choice",
- q:"Late night talks?",
- s:"Deep conversations or random nonsense?",
- options:["Deep & meaningful 🌙","Random chaos 😂"]},
+hope:{
+q:"So there’s at least a small possibility?",
+s:"I’m not asking for certainty. Just clarity.",
+options:[
+{text:"Maybe 😌",next:"patience"}
+]},
 
-{type:"text",
- q:"Okay serious question…",
- s:"Are you ready for someone who genuinely likes you?"},
+patience:{
+q:"I don’t mind waiting.",
+s:"Good things usually take time. And I’d rather be patient than rush something meaningful.",
+options:[
+{text:"That’s fair",next:"honest"},
+{text:"You’re calm about this 😅",next:"honest"}
+]},
 
-{type:"text",
- q:"So this is officially the beginning? 💕",
- s:"I’m really glad it’s you."}
-];
+honest:{
+q:"To be honest,",
+s:"I almost didn’t ask because I didn’t want to risk awkwardness. But I figured honesty is better than regret.",
+options:[
+{text:"I respect that",next:"depth"},
+{text:"That’s brave",next:"depth"}
+]},
+
+depth:{
+q:"Sometimes asking is harder than hearing no.",
+s:"But I’d rather know where I stand than keep guessing silently.",
+options:[
+{text:"I understand",next:"soft"},
+{text:"That makes sense",next:"soft"}
+]},
+
+respect:{
+q:"I understand.",
+s:"Not every timing aligns perfectly. And that’s completely okay.",
+options:[
+{text:"Okay",next:"soft"}
+]},
+
+soft:{
+q:"One last thing before we end this.",
+s:"No matter what your answer is today, I still genuinely think you’re someone worth respecting and appreciating.",
+options:[]
+}
+
+};
+
+/* =======================
+   ENGINE
+======================= */
+
+let currentNode;
 
 function playHappy(){
-    let happy=document.getElementById("happySong");
-    let sad=document.getElementById("sadSong");
-    if(mode!=="yes"){
-        sad.pause();
-        happy.currentTime=0;
-        happy.play();
-        mode="yes";
-    }
+document.getElementById("sadSong").pause();
+document.getElementById("happySong").currentTime=0;
+document.getElementById("happySong").play();
 }
 
 function playSad(){
-    let happy=document.getElementById("happySong");
-    let sad=document.getElementById("sadSong");
-    if(mode!=="no"){
-        happy.pause();
-        sad.currentTime=0;
-        sad.play();
-        mode="no";
-    }
+document.getElementById("happySong").pause();
+document.getElementById("sadSong").currentTime=0;
+document.getElementById("sadSong").play();
 }
 
-function handleNo(){
-
-    playSad();
-
-    document.getElementById("sticker").innerHTML =
-        "<source src='no1.mp4' type='video/mp4'>";
-
-    document.getElementById("question").innerText =
-        noJourney[noStep].q;
-
-    document.getElementById("subtext").innerText =
-        noJourney[noStep].s;
-
-    yesFontSize += 2;
-    let yesBtn=document.getElementById("yesBtn");
-    if(yesBtn){
-        yesBtn.style.fontSize = yesFontSize + "px";
-    }
-
-    noStep++;
-    if(noStep >= noJourney.length) noStep = 0;
+function startYes(){
+playHappy();
+document.getElementById("sticker").innerHTML="<source src='happy.mp4' type='video/mp4'>";
+currentNode="start";
+showNode(yesTree);
 }
 
-function handleYes(){
-
-    playHappy();
-
-    document.getElementById("sticker").innerHTML =
-        "<source src='happy.mp4' type='video/mp4'>";
-
-    showYesStep();
+function startNo(){
+playSad();
+document.getElementById("sticker").innerHTML="<source src='no1.mp4' type='video/mp4'>";
+currentNode="start";
+showNode(noTree);
 }
 
-function showYesStep(){
+function showNode(tree){
+let node=tree[currentNode];
+let buttonsDiv=document.getElementById("buttons");
 
-    let step=yesJourney[yesStep];
-    let buttonsDiv=document.getElementById("buttons");
+document.getElementById("question").innerText=node.q;
+document.getElementById("subtext").innerText=node.s;
 
-    if(!step){
+buttonsDiv.innerHTML="";
 
-        document.getElementById("question").innerText =
-            "Thank you for saying yes 😌💖";
+node.options.forEach(option=>{
+let btn=document.createElement("button");
+btn.className="yes";
+btn.innerText=option.text;
+btn.onclick=function(){
+currentNode=option.next;
+showNode(tree);
+};
+buttonsDiv.appendChild(btn);
+});
 
-        document.getElementById("subtext").innerText =
-            "You just made someone very happy. And honestly… you look even cuter smiling right now.";
-
-        buttonsDiv.innerHTML =
-            "<button class='yes'>Okay stop smiling like that 😏</button>";
-
-        return;
-    }
-
-    document.getElementById("question").innerText=step.q;
-    document.getElementById("subtext").innerText=step.s;
-
-    if(step.type==="text"){
-        buttonsDiv.innerHTML=
-            "<button class='yes' onclick='nextYes()'>Continue 😌</button>";
-    }
-    else{
-        buttonsDiv.innerHTML=
-            "<button class='yes' onclick='nextYes()'>"+step.options[0]+"</button>"+
-            "<button class='no' onclick='nextYes()'>"+step.options[1]+"</button>";
-    }
+if(node.options.length===0){
+buttonsDiv.innerHTML="<button class='yes' onclick='celebrate()'>End 🎆</button>";
+}
 }
 
-function nextYes(){
-    yesStep++;
-    showYesStep();
+/* =======================
+   CELEBRATION
+======================= */
+
+function celebrate(){
+
+fadeOutMusic();
+
+let celebration=document.getElementById("celebration");
+celebration.style.display="flex";
+
+for(let i=0;i<30;i++){
+let fw=document.createElement("div");
+fw.className="firework";
+fw.style.top=Math.random()*100+"%";
+fw.style.left=Math.random()*100+"%";
+fw.style.backgroundColor=randomColor();
+celebration.appendChild(fw);
+setTimeout(()=>fw.remove(),1000);
+}
+
+document.querySelector(".card").style.display="none";
+}
+
+function randomColor(){
+const colors=["#ffcc00","#ff6699","#66ffcc","#ffffff","#ff4444"];
+return colors[Math.floor(Math.random()*colors.length)];
+}
+
+function fadeOutMusic(){
+let happy=document.getElementById("happySong");
+let sad=document.getElementById("sadSong");
+let audio = happy.paused ? sad : happy;
+
+let fade=setInterval(function(){
+if(audio.volume>0.05){
+audio.volume-=0.05;
+}else{
+audio.pause();
+clearInterval(fade);
+}
+},100);
 }
 
 </script>
